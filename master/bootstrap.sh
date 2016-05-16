@@ -1,8 +1,3 @@
-# Amenable environment
-echo '[ "x$LC_CTYPE" = "xUTF-8" ] && unset LC_CTYPE' >> /home/vagrant/.profile
-cat /home/vagrant/.bashrc | awk 'index($0, "#force_color_prompt=yes") { print "force_color_prompt=yes"; next } { print }' > /home/vagrant/.bashrc
-chown vagrant:vagrant /home/vagrant/.bashrc
-
 # JDK 8
 apt-get install -y python-software-properties debconf-utils
 add-apt-repository -y ppa:webupd8team/java
