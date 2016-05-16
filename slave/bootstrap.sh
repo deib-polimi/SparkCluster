@@ -11,13 +11,6 @@ echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | 
 apt-get install -y oracle-java8-installer
 apt-get install -y oracle-java8-set-default
 
-# Spark
-wget http://mirrors.muzzy.it/apache/spark/spark-1.6.1/spark-1.6.1-bin-hadoop2.6.tgz
-tar xf spark-1.6.1-bin-hadoop2.6.tgz
-mv spark-1.6.1-bin-hadoop2.6 /usr/local/spark-1.6.1-bin-hadoop2.6
-ln -s /usr/local/spark-1.6.1-bin-hadoop2.6 /usr/local/spark
-rm spark-1.6.1-bin-hadoop2.6.tgz
-
 # Ambari
 cd /etc/apt/sources.list.d
 wget http://public-repo-1.hortonworks.com/ambari/ubuntu14/2.x/updates/2.2.2.0/ambari.list
