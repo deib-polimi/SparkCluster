@@ -48,7 +48,8 @@ IS_MESOS_MODE = "mesos" in SPARK_CLUSTER_URL
 USE_CLUSTER_SPARK = True
 
 # URL of the HDFS installation in the Spark EC2 cluster
-HDFS_URL = "hdfs://%s:9000/test/" % socket.gethostname()
+# HDFS_URL = "hdfs://%s:9000/test/" % socket.gethostname()
+HDFS_URL = "hdfs:///user/ubuntu/test/"
 
 # Set the following if not using existing Spark installation
 # Commit id and repo used if you are not using an existing Spark cluster
