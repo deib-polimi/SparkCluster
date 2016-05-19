@@ -55,53 +55,55 @@ So, we will used a [forked version](https://github.com/carduz/spark-perf). And w
     git clone https://github.com/carduz/spark-perf.git
     cp SparkCluster/spark-perf/config.py spark-perf/config/config.py
 
-Then edit `spark-perf/config/config.py`. The important things to look at are:
+Then take a look at our version of `spark-perf/config/config.py`. The important things to look at are:
 
-    # Point to an installation of Spark on the cluster.
-    SPARK_HOME_DIR = "/usr/hdp/current/spark-client"
+```python
+# Point to an installation of Spark on the cluster.
+SPARK_HOME_DIR = "/usr/hdp/current/spark-client"
 
-    # Additional options (our customization).
-    # --executor-cores must be 1 for YARN
-    ADDITIONAL_DATA = "--num-executors 5 --driver-memory 512m --executor-memory 512m --executor-cores 1"
+# Additional options (our customization).
+# --executor-cores must be 1 for YARN
+ADDITIONAL_DATA = "--num-executors 5 --driver-memory 512m --executor-memory 512m --executor-cores 1"
 
-    SPARK_CLUSTER_URL = "yarn"
-    USE_CLUSTER_SPARK = True
+SPARK_CLUSTER_URL = "yarn"
+USE_CLUSTER_SPARK = True
 
-    # URL of the HDFS installation in the Spark cluster.
-    # We need a directory where the user that is running the tests has privileges.
-    HDFS_URL = "hdfs:///user/ubuntu/test/"
+# URL of the HDFS installation in the Spark cluster.
+# We need a directory where the user that is running the tests has privileges.
+HDFS_URL = "hdfs:///user/ubuntu/test/"
 
-    # Which tests to run
-    RUN_SPARK_TESTS = True
-    RUN_PYSPARK_TESTS = False
-    RUN_STREAMING_TESTS = False
-    RUN_MLLIB_TESTS = False
-    RUN_PYTHON_MLLIB_TESTS = False
+# Which tests to run
+RUN_SPARK_TESTS = True
+RUN_PYSPARK_TESTS = False
+RUN_STREAMING_TESTS = False
+RUN_MLLIB_TESTS = False
+RUN_PYTHON_MLLIB_TESTS = False
 
-    # Which tests to prepare. Set this to true for the first
-    # installation or whenever you make a change to the tests.
-    PREP_SPARK_TESTS = True
-    PREP_PYSPARK_TESTS = False
-    PREP_STREAMING_TESTS = False
-    PREP_MLLIB_TESTS = False
+# Which tests to prepare. Set this to true for the first
+# installation or whenever you make a change to the tests.
+PREP_SPARK_TESTS = True
+PREP_PYSPARK_TESTS = False
+PREP_STREAMING_TESTS = False
+PREP_MLLIB_TESTS = False
 
-    # The default values configured below are appropriate for approximately 20 m1.xlarge nodes,
-    # in which each node has 15 GB of memory. Use this variable to scale the values (e.g.
-    # number of records in a generated dataset) if you are running the tests with more
-    # or fewer nodes. When developing new test suites, you might want to set this to a small
-    # value suitable for a single machine, such as 0.001.
-    SCALE_FACTOR = 0.001
+# The default values configured below are appropriate for approximately 20 m1.xlarge nodes,
+# in which each node has 15 GB of memory. Use this variable to scale the values (e.g.
+# number of records in a generated dataset) if you are running the tests with more
+# or fewer nodes. When developing new test suites, you might want to set this to a small
+# value suitable for a single machine, such as 0.001.
+SCALE_FACTOR = 0.001
 
-    # Memory options are really important: defaults are too high, we need to reduce them.
+# Memory options are really important: defaults are too high, we need to reduce them.
 
-    COMMON_JAVA_OPTS = [
-        # ...
-        JavaOptionSet("spark.executor.memory", ["2g"]),
-        # ...
-    ]
+COMMON_JAVA_OPTS = [
+    # ...
+    JavaOptionSet("spark.executor.memory", ["2g"]),
+    # ...
+]
 
-    # Set driver memory here
-    SPARK_DRIVER_MEMORY = "2g"
+# Set driver memory here
+SPARK_DRIVER_MEMORY = "2g"
+```
 
 ### 4. Run the benchmarks
 We can execute e.g. pyspark tests setting `RUN_PYSPARK_TESTS = True` and running:
