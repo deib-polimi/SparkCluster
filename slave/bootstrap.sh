@@ -28,3 +28,7 @@ service hostname restart
 
 # Misc
 apt-get install -y git
+
+# Python
+apt-get install -y python-pip
+pip install numpy
