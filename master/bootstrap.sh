@@ -1,3 +1,10 @@
+# Swap
+fallocate -l 4G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo "/swapfile   none    swap    sw    0   0" >> /etc/fstab
+
 # JDK 8
 apt-get install -y python-software-properties debconf-utils
 add-apt-repository -y ppa:webupd8team/java
