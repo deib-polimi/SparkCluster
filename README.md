@@ -8,8 +8,9 @@ It provides the script and the configuration files to install and Hadoop and Spa
 1. Install the required instances of [Ubuntu Server 14.04](http://www.ubuntu.com/download/server) on 5 VMs. One will be the master, the others will be the slaves of our Hadoop/Spark cluster. The configuration for the master and of the slaves are included in the Vagrantfiles and in the bootstrap files. The bootstrap files also install the required packages.
 1. Provision the machines (`vagrant up`) or execute `bootstrap.sh` as root.
 1. Put in `/etc/hosts` the required lines containing name-IP associations (master, slave1, slave2, ..., slaveN).
-1. Ensure SSH access from master to slaves with public key (required for Ambari setup):
+1. Ensure SSH access from master to itself and to slaves with public key (required for Ambari setup):
     1. `ssh-keygen`
+    1. `ssh-copy-id master`
     1. `for i in {1..$N_SLAVES}; do ssh-copy-id slave$i; done;`
 1. [Set up](https://ambari.apache.org/1.2.1/installing-hadoop-using-ambari/content/ambari-chap2-2.html) Ambari server on master (`ambari-server setup`). Choose custom Java JDK and give the contents of the `JAVA_HOME` environment variable when asked.
 1. [Start](https://ambari.apache.org/1.2.1/installing-hadoop-using-ambari/content/ambari-chap2-3.html) Ambari server (`ambari-server start`).
@@ -107,6 +108,8 @@ We can execute e.g. pyspark tests setting `RUN_PYSPARK_TESTS = True` and running
 
     bin/run
 
+**Note:** Don't configure `SPARK_HOME_DIR/config/slaves` since we use YARN, even if spark-perf suggests to do that
+
 ### 5. Parse the logs
 (To be done)
 
@@ -114,5 +117,5 @@ We can execute e.g. pyspark tests setting `RUN_PYSPARK_TESTS = True` and running
 
 ## TODO
 
-* Save and publish Ambari blueprint containing cluster configuration
-* Detail Ambari installation process
+- [ ] Save and publish Ambari blueprint containing cluster configuration
+- [ ] Detail Ambari installation process
