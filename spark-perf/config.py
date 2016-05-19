@@ -23,6 +23,10 @@ SPARK_HOME_DIR = "/usr/hdp/current/spark-client"
 # Use a custom configuration directory
 SPARK_CONF_DIR = SPARK_HOME_DIR + "/conf"
 
+# Additional data
+ADDITIONAL_DATA = "--num-executors 4 --driver-memory 512m --executor-memory 512m --executor-cores 2"
+#ADDITIONAL_DATA = ""
+
 # Master used when submitting Spark jobs.
 # For local clusters: "spark://%s:7077" % socket.gethostname()
 # For Yarn clusters: "yarn"
