@@ -29,7 +29,7 @@ echo "192.168.17.102 slave1" >> /etc/hosts
 service hostname restart
 
 # Misc
-apt-get install -y git htop
+apt-get install -y git htop iotop iftop
 
 # Python
 apt-get install -y python-pip

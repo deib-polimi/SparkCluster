@@ -27,7 +27,7 @@ echo "slave1" > /etc/hostname
 service hostname restart
 
 # Misc
-apt-get install -y git htop
+apt-get install -y git htop iotop iftop
 
 # Python
 apt-get install -y python-pip
