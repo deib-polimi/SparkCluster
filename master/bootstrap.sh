@@ -34,3 +34,6 @@ apt-get install -y git htop iotop iftop
 # Python
 apt-get install -y python-pip
 pip install numpy
+
+# Scala
+apt-get install -y scala
