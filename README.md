@@ -172,6 +172,8 @@ Run:
 
 TODO
 
+**Note:** if the bench doesn't produce any test with shuffle the parser fails
+
 ## TODO
 
 - [ ] Save and publish Ambari blueprint containing cluster configuration
