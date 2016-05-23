@@ -45,7 +45,7 @@ Configuration changes for YARN:
 
 All of these can be done with Ambari.
 
-### 3. Download, configure and run benchmarks
+### 3. Clone and inspect the benchmarks
 
 We used [spark-perf](https://github.com/databricks/spark-perf) to evaluate the performance of our cluster. However, to gain more flexibility, we modified it in order to parametrize the memory used for the tasks and the number of executors.
 
@@ -105,8 +105,29 @@ COMMON_JAVA_OPTS = [
 SPARK_DRIVER_MEMORY = "2g"
 ```
 
-### 4. Run the benchmarks
-We can execute e.g. pyspark tests setting `RUN_PYSPARK_TESTS = True` and running:
+### 4. Configure and run the benchmarks
+
+In `config/config.py` we can specify the classes of tests that we want to run.
+There are five classes, and they can be set in this way:
+
+```python
+RUN_SPARK_TESTS = True
+RUN_PYSPARK_TESTS = False
+RUN_STREAMING_TESTS = False
+RUN_MLLIB_TESTS = False
+RUN_PYTHON_MLLIB_TESTS = False
+```
+
+Also, we can specify the single tests that we want to run.
+For example, if in the pyspark tests we want to exclude `python-scheduling-throughput`, we can simply comment out the lines:
+
+```python
+PYSPARK_TESTS += [("python-scheduling-throughput", "core_tests.py",
+    SCALE_FACTOR, COMMON_JAVA_OPTS,
+    [ConstantOption("SchedulerThroughputTest"), OptionSet("num-tasks", [5000])] + COMMON_OPTS)]
+```
+
+We can execute the tests, by running:
 
     bin/run
 
@@ -118,7 +139,7 @@ We'll use [spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-
 
     git clone https://github.com/carduz/spark-log-processor.git
 
-`spark-log-processor` needs Spark 1.4.1 and MySQL to process the logs and generate the results.
+`spark-log-processor` needs Spark 1.4.1 and MySQL to process the logs and generate the results. So, it will need to run on a separate cluster, if you don't want to have two different versions of Spark on the same machine.
 
 Let's check the Spark configuration and take note of this.
 
