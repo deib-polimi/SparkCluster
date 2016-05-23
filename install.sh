@@ -15,12 +15,13 @@ fi
 
 if [ "$MODE" == "master" ]; then
     echo "master"
-    master/bootstrap.sh
+    sudo master/bootstrap.sh
     git clone http://github.com/carduz/spark-perf.git git/spark-perf
+    cp spark-perf/config.py git/spark-perf/config
 	exit 0
 elif [ "$MODE" == "performance" ]; then
 	echo "master"
-	performance/bootstrap.sh
+	sudo performance/bootstrap.sh
     git clone https://github.com/carduz/spark-log-processor.git git/spark-log-processor
     git/spark-log-processor/build.sh
     cp git/spark-log-processor/sparkloggerparser/target/uber-sparkloggerparser-0.0.1-SNAPSHOT.jar analysis_tool
@@ -28,7 +29,7 @@ elif [ "$MODE" == "performance" ]; then
 	exit 0
 elif [ "$MODE" == "slave" ]; then
 	echo "slave"
-	slave/bootstrap.sh
+	sudo slave/bootstrap.sh
 	exit 0
 else
 	echo "Usage: $0 {master|slave|performance}"

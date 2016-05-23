@@ -6,7 +6,7 @@ It provides the script and the configuration files to install and Hadoop and Spa
 ## How to replicate the experiment
 ### 1. Set up the cluster
 1. Install the required instances of [Ubuntu Server 14.04](http://www.ubuntu.com/download/server) on 5 VMs. One will be the master, the others will be the slaves of our Hadoop/Spark cluster. The configuration for the master and of the slaves are included in the Vagrantfiles and in the bootstrap files. The bootstrap files also install the required packages.
-1. Provision the machines (`vagrant up`) or execute `bootstrap.sh` as root.
+1. Provision the machines (`vagrant up`) or execute `install.sh` as root.
 1. Put in `/etc/hosts` the required lines containing name-IP associations (master, slave1, slave2, ..., slaveN).
 1. Ensure SSH access from master to itself and to slaves with public key (required for Ambari setup):
     1. `ssh-keygen`
@@ -46,6 +46,8 @@ Configuration changes for YARN:
 All of these can be done with Ambari.
 
 ### 3. Clone and inspect the benchmarks
+
+**If you have used `install.sh` you have to skip this point.**
 
 We used [spark-perf](https://github.com/databricks/spark-perf) to evaluate the performance of our cluster. However, to gain more flexibility, we modified it in order to parametrize the memory used for the tasks and the number of executors.
 
@@ -118,6 +120,8 @@ RUN_MLLIB_TESTS = False
 RUN_PYTHON_MLLIB_TESTS = False
 ```
 
+**Note:** The first time a test is executed it is needed to set to true `PREP_{TEST}`
+
 Also, we can specify the single tests that we want to run.
 For example, if in the pyspark tests we want to exclude `python-scheduling-throughput`, we can simply comment out the lines:
 
@@ -135,9 +139,15 @@ We can execute the tests, by running:
 
 ### 5. Parse the logs
 
+#### 5.1 Get logs
+
 First, we need to fetch the logs from HDFS to the local filesystem:
 
     hdfs -get /spark-history .
+
+#### 5.2 Clone and compiel the software
+
+**If you have used `install.sh` you have to skip this point.**
 
 We'll use [spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-log-processor) to parse the log.
 
@@ -180,3 +190,5 @@ TODO
 - [ ] Detail Ambari installation process
 - [ ] Specify how to run the performance estimator
 - [ ] Complete analyze.sh, installer for log analyzer
+- [ ] Complete point 5
+- [ ] Vagrant and remote version in install.sh
