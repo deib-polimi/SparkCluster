@@ -29,7 +29,6 @@ apt-get install -y ntp
 # Hosts
 echo "master" > /etc/hostname
 echo "192.168.17.101 master" >> /etc/hosts
-echo "192.168.17.102 slave1" >> /etc/hosts
 service hostname restart
 
 # Misc
