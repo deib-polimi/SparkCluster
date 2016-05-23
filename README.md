@@ -116,12 +116,16 @@ We can execute e.g. pyspark tests setting `RUN_PYSPARK_TESTS = True` and running
 
 We'll use [spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-log-processor).
 
-    git clone https://github.com/GiovanniPaoloGibilisco/spark-log-processor.git
+    git clone https://github.com/carduz/spark-log-processor.git
+
+`spark-log-processor` needs Spark 1.4.1 and MySQL to process the logs and generate the results.
 
 Let's check the Spark configuration and take note of this.
 
     spark.eventLog.enabled=true
     spark.eventLog.dir=hdfs:///spark-history
+
+Before building, we [removed (fork)](https://github.com/carduz/spark-log-processor/commit/4337f4dc74c333353640fb27e57fe224d895efd6) from `spark-log-processor/sparkloggerparser/pom.xml` an useless dependency which caused the build of performance-estimator to fail.
 
 Build the software:
 
@@ -134,14 +138,17 @@ To copy Spark logs in local:
 
     mkdir ~/spark-history
     chmod a+rwx ~/spark-history/
-    hdfs -get /spark-history ~/spark-history
+    hdfs -get /spark-history /home/ubuntu
 
 Run:
 
     cd ~/spark-log-processor/sparkloggerparser
-    spark-submit --class it.polimi.spark.LoggerParser --jars target/uber-sparkloggerparser-0.0.1-SNAPSHOT.jar target/sparkloggerparser-0.0.1-SNAPSHOT.jar -app application_1463564626422_0042 -o out
+    spark-submit --class it.polimi.spark.LoggerParser --jars target/uber-sparkloggerparser-0.0.1-SNAPSHOT.jar target/sparkloggerparser-0.0.1-SNAPSHOT.jar -i /spark-history/application_1463564626422_0042 -o out
+
+TODO
 
 ## TODO
 
 - [ ] Save and publish Ambari blueprint containing cluster configuration
 - [ ] Detail Ambari installation process
+- [ ] Specify how to run the performance estimator
