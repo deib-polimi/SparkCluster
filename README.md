@@ -135,7 +135,11 @@ We can execute the tests, by running:
 
 ### 5. Parse the logs
 
-We'll use [spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-log-processor).
+First, we need to fetch the logs from HDFS to the local filesystem:
+
+    hdfs -get /spark-history .
+
+We'll use [spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-log-processor) to parse the log.
 
     git clone https://github.com/carduz/spark-log-processor.git
 
@@ -173,3 +177,4 @@ TODO
 - [ ] Save and publish Ambari blueprint containing cluster configuration
 - [ ] Detail Ambari installation process
 - [ ] Specify how to run the performance estimator
+- [ ] Complete analyze.sh, installer for log analyzer
