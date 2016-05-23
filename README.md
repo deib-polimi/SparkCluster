@@ -113,9 +113,33 @@ We can execute e.g. pyspark tests setting `RUN_PYSPARK_TESTS = True` and running
 **Note:** Don't configure `SPARK_HOME_DIR/config/slaves` since we use YARN, even if spark-perf suggests to do that
 
 ### 5. Parse the logs
-(To be done)
 
-[spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-log-processor)
+We'll use [spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-log-processor).
+
+    git clone https://github.com/GiovanniPaoloGibilisco/spark-log-processor.git
+
+Let's check the Spark configuration and take note of this.
+
+    spark.eventLog.enabled=true
+    spark.eventLog.dir=hdfs:///spark-history
+
+Build the software:
+
+    cd spark-log-processor/sparkloggerparser
+    mvn clean package -Dmaven.test.skip=true
+    cd ../performance-estimator
+    mvn install
+
+To copy Spark logs in local:
+
+    mkdir ~/spark-history
+    chmod a+rwx ~/spark-history/
+    hdfs -get /spark-history ~/spark-history
+
+Run:
+
+    cd ~/spark-log-processor/sparkloggerparser
+    spark-submit --class it.polimi.spark.LoggerParser --jars target/uber-sparkloggerparser-0.0.1-SNAPSHOT.jar target/sparkloggerparser-0.0.1-SNAPSHOT.jar -app application_1463564626422_0042 -o out
 
 ## TODO
 
