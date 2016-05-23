@@ -24,7 +24,7 @@ SPARK_HOME_DIR = "/usr/hdp/current/spark-client"
 SPARK_CONF_DIR = SPARK_HOME_DIR + "/conf"
 
 # Additional data
-# --executor-cores 1 it must be 1 for YARN
+# --executor-cores it must be 1 for YARN
 ADDITIONAL_DATA = "--num-executors 5 --driver-memory 512m --executor-memory 512m --executor-cores 1"
 #ADDITIONAL_DATA = ""
 
