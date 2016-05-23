@@ -80,3 +80,5 @@ fabric.properties
 ### MISC ###
 
 .vagrant/
+*.log
+*.jar
