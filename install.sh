@@ -2,6 +2,12 @@
 
 MODE=$1
 
+OLD_DIR=${PWD}
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR
+
+trap 'cd $OLD_DIR' 0
+
 if [ $# -ne 1 ]; then
 	echo "Usage: $0 {master|slave|performance}"
 	exit 1
@@ -15,7 +21,10 @@ if [ "$MODE" == "master" ]; then
 elif [ "$MODE" == "performance" ]; then
 	echo "master"
 	performance/bootstrap.sh
-    https://github.com/carduz/spark-log-processor.git git/spark-log-processor
+    git clone https://github.com/carduz/spark-log-processor.git git/spark-log-processor
+    git/spark-log-processor/build.sh
+    cp git/spark-log-processor/sparkloggerparser/target/uber-sparkloggerparser-0.0.1-SNAPSHOT.jar analysis_tool
+    cp git/performance-estimator/target/performance-estimator-0.0.1-SNAPSHOT-jar-with-dependencies.jar analysis_tool
 	exit 0
 elif [ "$MODE" == "slave" ]; then
 	echo "slave"
