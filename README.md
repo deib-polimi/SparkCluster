@@ -145,7 +145,7 @@ First, we need to fetch the logs from HDFS to the local filesystem:
 
     hdfs -get /spark-history .
 
-#### 5.2 Clone and compiel the software
+#### 5.2 Clone and compile the software
 
 **If you have used `install.sh` you have to skip this point.**
 
