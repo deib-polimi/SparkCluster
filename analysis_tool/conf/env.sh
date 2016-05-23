@@ -1,7 +1,7 @@
 #Properties file for the logger parser
 
 #Address to notify of completed analyses
-SEND_TO=eugenio.gianniti@polimi.it
+SEND_TO=EAMIL
 
 #The directory on HDFS where the parser save the result of the analysis
 HDFS_OUTPUT_DIR=/analysis
@@ -24,7 +24,7 @@ MAIL=/var/spool/mail/gibilisco
 #Username and password of the db to which export the analysis results
 DB_URL=jdbc:mysql://127.0.0.1/sparkbench
 DB_USER_NAME=analysis
-DB_PASSWORD=PASSWORD
+DB_PASSWORD=wjfe3e77l4V
 
 #Base folder of the ftp used to store logs and results after the analysis
 FTP_BASE=/opt/ftp
