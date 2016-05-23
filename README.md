@@ -12,21 +12,21 @@ It provides the script and the configuration files to install and Hadoop and Spa
     1. `ssh-keygen`
     1. `ssh-copy-id master`
     1. `for i in {1..$N_SLAVES}; do ssh-copy-id slave$i; done;`
-1. [Set up](https://ambari.apache.org/1.2.1/installing-hadoop-using-ambari/content/ambari-chap2-2.html) Ambari server on master (`ambari-server setup`). Choose custom Java JDK and give the contents of the `JAVA_HOME` environment variable when asked.
-1. [Start](https://ambari.apache.org/1.2.1/installing-hadoop-using-ambari/content/ambari-chap2-3.html) Ambari server (`ambari-server start`).
+1. [Set up](https://ambari.apache.org/1.2.1/installing-hadoop-using-ambari/content/ambari-chap2-2.html) Ambari server (v 2.2.2.0) on master (`ambari-server setup`). Choose custom Java JDK and give the contents of the `JAVA_HOME` environment variable when asked.
+1. [Start](https://ambari.apache.org/1.2.1/installing-hadoop-using-ambari/content/ambari-chap2-3.html) Ambari server (v 2.2.2.0) (`ambari-server start`).
 1. Go to the web page of Ambari server (`http://master:8080`).
 1. Start installation process and specify the names (the same of `/etc/hosts`) of the master and the slaves.
 1. Give to Ambari the SSH private key of the server when asked.
 1. Intall on the cluster the following software:
-    * HDFS
-    * MapReduce2
-    * YARN
-    * Tez
-    * Hive
-    * Pig
-    * ZooKeeper
-    * Ambari Metrics
-    * Spark
+    * HDFS 2.7.1.2.4
+    * YARN + MapReduce2 2.7.1.2.4
+    * Tez 0.7.0.2.4
+    * Hive 1.2.1.2.4
+    * Pig 0.15.0.2.4
+    * ZooKeeper 3.4.6.2.4
+    * Hadoop 2.7.1.2.4
+    * Ambari Metrics 0.1.0
+    * Spark 1.6.1
 1. Start all the services from Ambari and check that they're working.
 
 ### 2. Configure Spark and YARN
