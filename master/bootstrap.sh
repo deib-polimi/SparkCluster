@@ -40,6 +40,3 @@ pip install numpy
 
 # Scala
 apt-get install -y scala
-
-# Shortcut for HDFS command
-echo 'alias hdfs="sudo -u hdfs hdfs dfs"' >> .profile

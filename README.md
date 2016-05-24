@@ -6,10 +6,10 @@ It provides the script and the configuration files to install and Hadoop and Spa
 ## How to replicate the experiment
 ### 1. Set up the cluster
 1. Install the required instances of [Ubuntu Server 14.04](http://www.ubuntu.com/download/server) on the number of VMs that you want. We first tested this configuration with 5 nodes. One of the nodes will be the master, the others will be the slaves of our Hadoop/Spark cluster. The configuration for the master and of the slaves are included in the Vagrantfiles and in the bootstrap.sh files. The bootstrap files also take care of installing the required packages.
-1. Provision the machines (`vagrant up`) or execute `install.sh` as root.
+1. Provision the machines and execute `install.sh` as root.
 1. For each machine:
     1. edit `/etc/hostname` to match "master" or "slave1", "slave2", ...
-    1. edit `/etc/hosts` to add the IP address of the master and of the hostname set for the local machine
+    1. edit `/etc/hosts` to add the IP address of all the machines in the cluster
     1. `sudo service hostname restart`
 1. master must be able to access via SSH to itself and to the slaves using public key and passwordless (required for Ambari setup). So, on master:
     1. `ssh-keygen`
@@ -64,33 +64,51 @@ So, we will used a [forked version](https://github.com/carduz/spark-perf). And w
 Then take a look at our version of `spark-perf/config/config.py`. The important things to look at are:
 
 ```python
+# ================================ #
+#  Standard Configuration Options  #
+# ================================ #
+
 # Point to an installation of Spark on the cluster.
+# This path is valid for Spark 1.6.1 installed with Ambari.
 SPARK_HOME_DIR = "/usr/hdp/current/spark-client"
 
-# Additional options (our customization).
-# --executor-cores must be 1 for YARN
-ADDITIONAL_DATA = "--num-executors 5 --driver-memory 512m --executor-memory 512m --executor-cores 1"
+# Set driver memory here
+# --driver-memory MEM         Memory for driver (e.g. 1000M, 2G) (Default: 1024M).
+SPARK_DRIVER_MEMORY = "2g"
 
+# Additional data: spark-submit options, launch spark-submit to see them all.
+# --executor-cores NUM        Number of cores per executor. (Default: 1 in YARN mode,
+#                               or all available cores on the worker in standalone mode)
+# --num-executors NUM         Number of executors to launch (Default: 2).
+# --executor-memory MEM       Memory per executor (e.g. 1000M, 2G) (Default: 1G).
+ADDITIONAL_DATA = "--num-executors 5 --executor-memory 512m --executor-cores 1"
+ADDITIONAL_DATA += " --driver-memory %s" % SPARK_DRIVER_MEMORY
+
+# SPARK_CLUSTER_URL: Master used when submitting Spark jobs.
+# For local clusters: "spark://%s:7077" % socket.gethostname()
+# For Yarn clusters: "yarn"
+# Otherwise, the default uses the specified EC2 cluster
+#SPARK_CLUSTER_URL = open("/root/spark-ec2/cluster-url", 'r').readline().strip()
 SPARK_CLUSTER_URL = "yarn"
+
+# If this is true, we'll submit your job using an existing Spark installation.
+# If this is false, we'll clone and build a specific version of Spark, and
+# copy configurations from your existing Spark installation.
 USE_CLUSTER_SPARK = True
 
-# URL of the HDFS installation in the Spark cluster.
-# We need a directory where the user that is running the tests has privileges.
-HDFS_URL = "hdfs:///user/ubuntu/test/"
-
-# Which tests to run
+# Which test sets to run. Each test set contains several tests.
 RUN_SPARK_TESTS = True
-RUN_PYSPARK_TESTS = False
-RUN_STREAMING_TESTS = False
-RUN_MLLIB_TESTS = False
-RUN_PYTHON_MLLIB_TESTS = False
+RUN_PYSPARK_TESTS = True
+RUN_STREAMING_TESTS = True
+RUN_MLLIB_TESTS = True
+RUN_PYTHON_MLLIB_TESTS = True
 
 # Which tests to prepare. Set this to true for the first
 # installation or whenever you make a change to the tests.
 PREP_SPARK_TESTS = True
-PREP_PYSPARK_TESTS = False
-PREP_STREAMING_TESTS = False
-PREP_MLLIB_TESTS = False
+PREP_PYSPARK_TESTS = True
+PREP_STREAMING_TESTS = True
+PREP_MLLIB_TESTS = True
 
 # The default values configured below are appropriate for approximately 20 m1.xlarge nodes,
 # in which each node has 15 GB of memory. Use this variable to scale the values (e.g.
@@ -106,15 +124,12 @@ COMMON_JAVA_OPTS = [
     JavaOptionSet("spark.executor.memory", ["2g"]),
     # ...
 ]
-
-# Set driver memory here
-SPARK_DRIVER_MEMORY = "2g"
 ```
 
 ### 4. Configure and run the benchmarks
 
-In `config/config.py` we can specify the classes of tests that we want to run.
-There are five classes, and they can be set in this way:
+In `config/config.py` we can specify the test sets that we want to run.
+There are five test set, and they can be enabled or disabled with the corresponding configuration variables:
 
 ```python
 RUN_SPARK_TESTS = True
@@ -124,9 +139,9 @@ RUN_MLLIB_TESTS = False
 RUN_PYTHON_MLLIB_TESTS = False
 ```
 
-**Note:** The first time a test is executed it is needed to set to true `PREP_{TEST}`
+**Note:** The first time a test is executed you need to set the corresponding `PREP_{TEST}` variable to true.
 
-Also, we can specify the single tests that we want to run.
+Also, using `config.py` we can specify the single tests that we want to run inside each test set.
 For example, if in the pyspark tests we want to exclude `python-scheduling-throughput`, we can simply comment out the lines:
 
 ```python
@@ -147,7 +162,13 @@ We can execute the tests, by running:
 
 First, we need to fetch the logs from HDFS to the local filesystem:
 
-    hdfs -get /spark-history .
+    sudo -u hdfs hdfs dfs -get /spark-history .
+
+If you want to clear the generated logs:
+
+    sudo -u hdfs hdfs dfs -rm "/spark-history/*"
+
+Don't remove the spark-history folder, as the benchmarks may encounter permission problems.
 
 #### 5.2 Clone and compile the software
 
@@ -186,7 +207,7 @@ Run:
 
 TODO
 
-**Note:** if the bench doesn't produce any test with shuffle the parser fails
+**Note:** if the benchmark doesn't perform any shuffle operation in a single log file, the parser fails to parse that file: it expect some shuffle statistics.
 
 ## TODO
 

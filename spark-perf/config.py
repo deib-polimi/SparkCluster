@@ -18,17 +18,25 @@ from sparkperf.config_utils import FlagSet, JavaOptionSet, OptionSet, ConstantOp
 # ================================ #
 
 # Point to an installation of Spark on the cluster.
+# This path is valid for Spark 1.6.1 installed with Ambari.
 SPARK_HOME_DIR = "/usr/hdp/current/spark-client"
 
 # Use a custom configuration directory
 SPARK_CONF_DIR = SPARK_HOME_DIR + "/conf"
 
-# Additional data
-# --executor-cores it must be 1 for YARN
-ADDITIONAL_DATA = "--num-executors 5 --driver-memory 512m --executor-memory 512m --executor-cores 1"
-#ADDITIONAL_DATA = ""
+# Set driver memory here
+# --driver-memory MEM         Memory for driver (e.g. 1000M, 2G) (Default: 1024M).
+SPARK_DRIVER_MEMORY = "2g"
 
-# Master used when submitting Spark jobs.
+# Additional data: spark-submit options, launch spark-submit to see them all.
+# --executor-cores NUM        Number of cores per executor. (Default: 1 in YARN mode,
+#                               or all available cores on the worker in standalone mode)
+# --num-executors NUM         Number of executors to launch (Default: 2).
+# --executor-memory MEM       Memory per executor (e.g. 1000M, 2G) (Default: 1G).
+ADDITIONAL_DATA = "--num-executors 5 --executor-memory 512m --executor-cores 1"
+ADDITIONAL_DATA += " --driver-memory %s" % SPARK_DRIVER_MEMORY
+
+# SPARK_CLUSTER_URL: Master used when submitting Spark jobs.
 # For local clusters: "spark://%s:7077" % socket.gethostname()
 # For Yarn clusters: "yarn"
 # Otherwise, the default uses the specified EC2 cluster
@@ -46,14 +54,14 @@ IS_MESOS_MODE = "mesos" in SPARK_CLUSTER_URL
 # Run Mesos client in coarse or fine grain mode. This is only applied for running with Mesos.
 #SPARK_MESOS_COARSE = True
 
-
 # If this is true, we'll submit your job using an existing Spark installation.
 # If this is false, we'll clone and build a specific version of Spark, and
 # copy configurations from your existing Spark installation.
 USE_CLUSTER_SPARK = True
 
-# URL of the HDFS installation in the Spark EC2 cluster
+# URL of the HDFS installation
 # HDFS_URL = "hdfs://%s:9000/test/" % socket.gethostname()
+# For HDFS + YARN (three slashes are correct):
 HDFS_URL = "hdfs:///user/ubuntu/test/"
 
 # Set the following if not using existing Spark installation
@@ -82,19 +90,19 @@ RESTART_SPARK_CLUSTER = RESTART_SPARK_CLUSTER and not IS_YARN_MODE
 # Rsync SPARK_HOME to all the slaves or not
 RSYNC_SPARK_HOME = True
 
-# Which tests to run
+# Which test sets to run. Each test set contains several tests.
 RUN_SPARK_TESTS = True
-RUN_PYSPARK_TESTS = False
-RUN_STREAMING_TESTS = False
-RUN_MLLIB_TESTS = False
-RUN_PYTHON_MLLIB_TESTS = False
+RUN_PYSPARK_TESTS = True
+RUN_STREAMING_TESTS = True
+RUN_MLLIB_TESTS = True
+RUN_PYTHON_MLLIB_TESTS = True
 
 # Which tests to prepare. Set this to true for the first
 # installation or whenever you make a change to the tests.
 PREP_SPARK_TESTS = True
-PREP_PYSPARK_TESTS = False
-PREP_STREAMING_TESTS = False
-PREP_MLLIB_TESTS = False
+PREP_PYSPARK_TESTS = True
+PREP_STREAMING_TESTS = True
+PREP_MLLIB_TESTS = True
 
 # Whether to warm up local disks (warm-up is only necesary on EC2).
 DISK_WARMUP = False
@@ -157,8 +165,7 @@ COMMON_JAVA_OPTS = [
     # To ensure consistency across runs, we disable delay scheduling
     JavaOptionSet("spark.locality.wait", [str(60 * 1000 * 1000)])
 ]
-# Set driver memory here
-SPARK_DRIVER_MEMORY = "2g"
+
 # The following options value sets are shared among all tests.
 COMMON_OPTS = [
     # How many times to run each experiment - used to warm up system caches.
@@ -802,5 +809,3 @@ if MLLIB_SPARK_VERSION >= 1.1:
     PYTHON_MLLIB_TESTS += [("python-spearman", "mllib_tests.py", SCALE_FACTOR,
                              MLLIB_JAVA_OPTS, [ConstantOption("SpearmanCorrelationTest")] +
                              MLLIB_SPEARMAN_TEST_OPTS)]
-
-
