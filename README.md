@@ -195,4 +195,4 @@ TODO
 - [ ] Specify how to run the performance estimator
 - [ ] Complete analyze.sh, installer for log analyzer
 - [ ] Complete point 5
-- [ ] Vagrant and remote version in install.sh
+- [ ] Fix readme according to installRemote and vagrant
