@@ -25,10 +25,6 @@ apt-get update
 apt-get install -y ambari-agent
 apt-get install -y ntp
 
-# Hosts
-echo "192.168.17.101 master" >> /etc/hosts
-service hostname restart
-
 # Misc
 apt-get install -y git htop iotop iftop
 
