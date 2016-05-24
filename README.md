@@ -14,7 +14,7 @@ This setup was tested with **5 virtual nodes**, each with:
 
 #### 1.2 Installation procedure
 
-1. Install the required instances of [Ubuntu Server 14.04](http://www.ubuntu.com/download/server) on the number of VMs that you want. We first tested this configuration with 5 nodes. One of the nodes will be the master, the others will be the slaves of our Hadoop/Spark cluster. The configuration for the master and of the slaves are included in the Vagrantfiles and in the bootstrap.sh files. The bootstrap files also take care of installing the required packages.
+1. Install the required instances of [Ubuntu Server 14.04](http://www.ubuntu.com/download/server) on the number of VMs that you want. We first tested this configuration with 5 nodes. One of the nodes will be the master, the others will be the slaves of our Hadoop/Spark cluster. The configuration for the master and of the slaves are included in the Vagrantfiles and in the `bootstrap.sh` files. The bootstrap files also take care of installing the required packages.
 1. Provision the machines. Two alternatives:
     * execute `install.sh {master|slave}` as root directly on the instances
     * execute `installRemote.sh address {master|slave}` locally
