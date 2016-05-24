@@ -34,3 +34,7 @@ pip install numpy
 
 # Scala
 apt-get install -y scala
+
+#clean
+apt-get autoremove
+apt-get clean
