@@ -198,7 +198,7 @@ To copy Spark logs in local:
 
     mkdir ~/spark-history
     chmod a+rwx ~/spark-history/
-    hdfs -get /spark-history /home/ubuntu
+    sudo -u hdfs hdfs dfs -get /spark-history /home/ubuntu
 
 Run:
 
