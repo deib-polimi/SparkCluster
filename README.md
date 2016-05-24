@@ -33,6 +33,11 @@ It provides the script and the configuration files to install and Hadoop and Spa
 
 1. Start all the services from Ambari and check that they're working.
 
+There is a saved Ambari blueprint with all the settings in the [`blueprint` folder](https://github.com/deib-polimi/SparkCluster/tree/master/blueprint).
+It was obtained with the Ambari API call:
+
+    http://master:8080/api/v1/clusters/myclustername?format=blueprint
+
 ### 2. Configure Spark and YARN
 
 We tweaked a couple variables to assign more memory to the workers.
@@ -211,8 +216,6 @@ TODO
 
 ## TODO
 
-- [ ] Save and publish Ambari blueprint containing cluster configuration
-- [ ] Detail Ambari installation process
 - [ ] Specify how to run the performance estimator
 - [ ] Complete analyze.sh, installer for log analyzer
 - [ ] Complete point 5
