@@ -5,8 +5,19 @@ It provides the script and the configuration files to install and Hadoop and Spa
 
 ## How to replicate the experiment
 ### 1. Set up the cluster
+
+#### 1.1 Hardware setup
+This setup was tested with **5 virtual nodes**, each with:
+* 4 GB of RAM
+* 2 virtual CPU
+* 40 GB of disk space
+
+#### 1.2 Installation procedure
+
 1. Install the required instances of [Ubuntu Server 14.04](http://www.ubuntu.com/download/server) on the number of VMs that you want. We first tested this configuration with 5 nodes. One of the nodes will be the master, the others will be the slaves of our Hadoop/Spark cluster. The configuration for the master and of the slaves are included in the Vagrantfiles and in the bootstrap.sh files. The bootstrap files also take care of installing the required packages.
-1. Provision the machines and execute `install.sh` as root.
+1. Provision the machines. Two alternatives:
+    * execute `install.sh {master|slave}` as root directly on the instances
+    * execute `installRemote.sh address {master|slave}` locally
 1. For each machine:
     1. edit `/etc/hostname` to match "master" or "slave1", "slave2", ...
     1. edit `/etc/hosts` to add the IP address of all the machines in the cluster
@@ -30,7 +41,6 @@ It provides the script and the configuration files to install and Hadoop and Spa
     * Hadoop 2.7.1.2.4
     * Ambari Metrics 0.1.0
     * Spark 1.6.1
-
 1. Start all the services from Ambari and check that they're working.
 
 There is a saved Ambari blueprint with all the settings in the [`blueprint` folder](https://github.com/deib-polimi/SparkCluster/tree/master/blueprint).
@@ -56,17 +66,13 @@ All of these can be done with Ambari.
 
 ### 3. Clone and inspect the benchmarks
 
-**If you have used `install.sh` you have to skip this point.**
-
 We used [spark-perf](https://github.com/databricks/spark-perf) to evaluate the performance of our cluster. However, to gain more flexibility, we modified it in order to parametrize the memory used for the tasks and the number of executors.
 
 So, we will used a [forked version](https://github.com/carduz/spark-perf). And we built a [configuration file](https://github.com/deib-polimi/SparkCluster/blob/master/spark-perf/config.py) for that.
 
-    git clone https://github.com/deib-polimi/SparkCluster.git
-    git clone https://github.com/carduz/spark-perf.git
-    cp SparkCluster/spark-perf/config.py spark-perf/config/config.py
+**`install.sh master` already cloned those repositories for you.**
 
-Then take a look at our version of `spark-perf/config/config.py`. The important things to look at are:
+Now take a look at our version of `spark-perf/config/config.py`. The important things to look at are:
 
 ```python
 # ================================ #
@@ -144,7 +150,7 @@ RUN_MLLIB_TESTS = False
 RUN_PYTHON_MLLIB_TESTS = False
 ```
 
-**Note:** The first time a test is executed you need to set the corresponding `PREP_{TEST}` variable to true.
+**Note:** The first time a test is executed you need to set the corresponding `PREP_{TEST}` variable to true in order to compile it.
 
 Also, using `config.py` we can specify the single tests that we want to run inside each test set.
 For example, if in the pyspark tests we want to exclude `python-scheduling-throughput`, we can simply comment out the lines:
@@ -163,60 +169,57 @@ We can execute the tests, by running:
 
 ### 5. Parse the logs
 
+We'll use [spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-log-processor) to parse the log.
+
+`spark-log-processor` needs Spark 1.4.1 and MySQL to process the logs and generate the results. So, **it will need to run on a separate cluster**, if you don't want to have two different versions of Spark on the same machine.
+
+**Installation of Spark 1.4.1 is not covered by install.sh. You will need to do it by hand.**
+
 #### 5.1 Get logs
 
-First, we need to fetch the logs from HDFS to the local filesystem:
+First, we need to fetch the logs from HDFS to the local filesystem of our cluster:
 
     sudo -u hdfs hdfs dfs -get /spark-history .
 
+Then you will need to copy them to the analysis server, e.g. with rsync.
+
 If you want to clear the generated logs:
 
-    sudo -u hdfs hdfs dfs -rm "/spark-history/*"
+    sudo -u hdfs hdfs dfs -rm "/spark-history/* "
 
 Don't remove the spark-history folder, as the benchmarks may encounter permission problems.
 
-#### 5.2 Clone and compile the software
+#### 5.2 Clone and compile the software on the analysis cluster
 
-**If you have used `install.sh` you have to skip this point.**
-
-We'll use [spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-log-processor) to parse the log.
-
-    git clone https://github.com/carduz/spark-log-processor.git
-
-`spark-log-processor` needs Spark 1.4.1 and MySQL to process the logs and generate the results. So, it will need to run on a separate cluster, if you don't want to have two different versions of Spark on the same machine.
-
-Let's check the Spark configuration and take note of this.
+Let's check the Spark configuration of the cluster to benchmark and take note of this.
 
     spark.eventLog.enabled=true
     spark.eventLog.dir=hdfs:///spark-history
 
 Before building, we [removed (fork)](https://github.com/carduz/spark-log-processor/commit/4337f4dc74c333353640fb27e57fe224d895efd6) from `spark-log-processor/sparkloggerparser/pom.xml` an useless dependency which caused the build of performance-estimator to fail.
 
-Build the software:
+To install all the things that are needed on the host dedicated to log parsing, simply run:
 
-    cd spark-log-processor/sparkloggerparser
-    mvn clean package -Dmaven.test.skip=true
-    cd ../performance-estimator
-    mvn install
+    ./SparkCluster/install.sh performance
 
-To copy Spark logs in local:
+This will install all the packages needed for the analysis of the Spark logs, including MySQL, the performance database, spark-log-processor; it will also compile the required dependencies.
 
-    mkdir ~/spark-history
-    chmod a+rwx ~/spark-history/
-    sudo -u hdfs hdfs dfs -get /spark-history /home/ubuntu
+You may want to tweak the parameters of the cluster to test corresponding to the name `yarn-client` in the `sparkperf.cluster` table in MySQL.
 
-Run:
+### 5.3 Automated parsing of the logs
 
-    cd ~/spark-log-processor/sparkloggerparser
-    spark-submit --class it.polimi.spark.LoggerParser --jars target/uber-sparkloggerparser-0.0.1-SNAPSHOT.jar target/sparkloggerparser-0.0.1-SNAPSHOT.jar -i /spark-history/application_1463564626422_0042 -o out
+The `analysis_tool` folder contains a method to automatically parse the logs and write the results to MySQL. It was automatically installed by `install.sh performance`.
 
-TODO
+You must check out `analysis_tool/conf/env.sh` and configure the paths for your machine.
+
+To analyze the logs:
+1. Copy the log files into `$FTP_BASE/incoming`
+1. Run `analysis_tool/bin/ftp_listener.sh`
+
+The script will automatically detect the logs and it will process them. In case of errors, check `analysis_tool/logs`.
 
 **Note:** if the benchmark doesn't perform any shuffle operation in a single log file, the parser fails to parse that file: it expect some shuffle statistics.
 
 ## TODO
 
-- [ ] Specify how to run the performance estimator
 - [ ] Complete analyze.sh, installer for log analyzer
-- [ ] Complete point 5
-- [ ] Fix readme according to installRemote and vagrant
