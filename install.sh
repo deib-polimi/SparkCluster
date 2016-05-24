@@ -8,9 +8,16 @@ cd $DIR
 
 trap 'cd $OLD_DIR' 0
 
+usage (){
+echo "Usage: $0 {master|slave|performance}"
+echo -e "\tmaster:\t\texecute master/bootstrap and clone spark-perf using the right config"
+echo -e "\tslave:\t\texecute slave/bootstrap "
+echo -e "\tperformance:\texecute performance/bootstrap, clone and compile spark-log-processors"
+exit 1
+}
+
 if [ $# -ne 1 ]; then
-    echo "Usage: $0 {master|slave|performance}"
-    exit 1
+    usage
 fi
 
 if [ "$MODE" == "master" ]; then
@@ -32,6 +39,5 @@ elif [ "$MODE" == "slave" ]; then
     sudo slave/bootstrap.sh
     exit 0
 else
-    echo "Usage: $0 {master|slave|performance}"
-    exit 1
+    usage
 fi
