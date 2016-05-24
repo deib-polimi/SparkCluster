@@ -32,7 +32,7 @@ echo "192.168.17.101 master" >> /etc/hosts
 service hostname restart
 
 # Misc
-apt-get install -y git htop iotop iftop
+apt-get install -y git htop iotop iftop ansible
 
 # Python
 apt-get install -y python-dev python-pip

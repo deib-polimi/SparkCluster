@@ -5,19 +5,22 @@ It provides the script and the configuration files to install and Hadoop and Spa
 
 ## How to replicate the experiment
 ### 1. Set up the cluster
-1. Install the required instances of [Ubuntu Server 14.04](http://www.ubuntu.com/download/server) on 5 VMs. One will be the master, the others will be the slaves of our Hadoop/Spark cluster. The configuration for the master and of the slaves are included in the Vagrantfiles and in the bootstrap files. The bootstrap files also install the required packages.
+1. Install the required instances of [Ubuntu Server 14.04](http://www.ubuntu.com/download/server) on the number of VMs that you want. We first tested this configuration with 5 nodes. One of the nodes will be the master, the others will be the slaves of our Hadoop/Spark cluster. The configuration for the master and of the slaves are included in the Vagrantfiles and in the bootstrap.sh files. The bootstrap files also take care of installing the required packages.
 1. Provision the machines (`vagrant up`) or execute `install.sh` as root.
-1. Put in `/etc/hosts` the required lines containing name-IP associations (master, slave1, slave2, ..., slaveN).
-1. Ensure SSH access from master to itself and to slaves with public key (required for Ambari setup):
+1. For each machine:
+    1. edit `/etc/hostname` to match "master" or "slave1", "slave2", ...
+    1. edit `/etc/hosts` to add the IP address of the master and of the hostname set for the local machine
+    1. `sudo service hostname restart`
+1. master must be able to access via SSH to itself and to the slaves using public key and passwordless (required for Ambari setup). So, on master:
     1. `ssh-keygen`
     1. `ssh-copy-id master`
     1. `for i in {1..$N_SLAVES}; do ssh-copy-id slave$i; done;`
-1. [Set up](https://ambari.apache.org/1.2.1/installing-hadoop-using-ambari/content/ambari-chap2-2.html) Ambari server (v 2.2.2.0) on master (`ambari-server setup`). Choose custom Java JDK and give the contents of the `JAVA_HOME` environment variable when asked.
+1. On master, [set up](https://ambari.apache.org/1.2.1/installing-hadoop-using-ambari/content/ambari-chap2-2.html) Ambari server (v 2.2.2.0) on master (`ambari-server setup`). Choose custom Java JDK and give the result of the `echo $JAVA_HOME` command when asked for Java Home.
 1. [Start](https://ambari.apache.org/1.2.1/installing-hadoop-using-ambari/content/ambari-chap2-3.html) Ambari server (v 2.2.2.0) (`ambari-server start`).
 1. Go to the web page of Ambari server (`http://master:8080`).
-1. Start installation process and specify the names (the same of `/etc/hosts`) of the master and the slaves.
-1. Give to Ambari the SSH private key of the server when asked.
-1. Intall on the cluster the following software:
+1. Start installation process and give to Ambari the names (the same of `/etc/hosts`) of the master and the slaves. It could complain about them not being FQDNs: that's not a problem.
+1. Give to Ambari the SSH private key (`~/.ssh/id_rsa`) of the master when asked: it needs it to install all the things on the slaves.
+1. Using Ambari, install on the cluster the following software. Pure slaves should have at least the DataNode, NodeManager, YARN Client and Spark Client. Master services can be distributed among some slaves.
     * HDFS 2.7.1.2.4
     * YARN + MapReduce2 2.7.1.2.4
     * Tez 0.7.0.2.4
@@ -27,6 +30,7 @@ It provides the script and the configuration files to install and Hadoop and Spa
     * Hadoop 2.7.1.2.4
     * Ambari Metrics 0.1.0
     * Spark 1.6.1
+
 1. Start all the services from Ambari and check that they're working.
 
 ### 2. Configure Spark and YARN
