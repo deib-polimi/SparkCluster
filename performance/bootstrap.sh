@@ -34,7 +34,7 @@ mysql -u root -proot -e "GRANT ALL PRIVILEGES ON sparkbench.* TO 'analysis'@'loc
 apt-get install -y git htop iotop iftop
 
 # Python
-apt-get install -y python-pip
+apt-get install -y python-dev python-pip
 pip install numpy
 
 # Scala
