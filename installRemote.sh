@@ -18,4 +18,4 @@ fi
 scp -r ../SparkCluster $REMOTE:~/SparkCluster
 
 #install
-ssh $REMOTE "cd ~/SparkCluster/install.sh $MODE"
+ssh $REMOTE "~/SparkCluster/install.sh $MODE"
