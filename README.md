@@ -50,6 +50,7 @@ It was obtained with the Ambari API call:
 
 ### 2. Configure Spark and YARN
 
+#### 2.1 Memory
 We tweaked a couple variables to assign more memory to the workers.
 
 Configuration changes for Spark:
@@ -63,6 +64,13 @@ Configuration changes for YARN:
     yarn.scheduler.maximum-allocation-mb=3584
 
 All of these can be done with Ambari.
+
+#### 2.2 Home directory in HDFS
+
+Once HDFS is started and running, create the home directory for the user "ubuntu" on HDFS, and assign the correct privileges.
+
+    sudo -u hdfs hadoop fs -mkdir /user/ubuntu
+    sudo -u hdfs hadoop fs -chown -R ubuntu:hdfs /user/ubuntu
 
 ### 3. Clone and inspect the benchmarks
 
@@ -179,13 +187,13 @@ We'll use [spark-log-processor](https://github.com/GiovanniPaoloGibilisco/spark-
 
 First, we need to fetch the logs from HDFS to the local filesystem of our cluster:
 
-    sudo -u hdfs hdfs dfs -get /spark-history .
+    sudo -u hdfs hadoop fs -get /spark-history .
 
 Then you will need to copy them to the analysis server, e.g. with rsync.
 
 If you want to clear the generated logs:
 
-    sudo -u hdfs hdfs dfs -rm "/spark-history/* "
+    sudo -u hdfs hadoop fs -rm "/spark-history/* "
 
 Don't remove the spark-history folder, as the benchmarks may encounter permission problems.
 
